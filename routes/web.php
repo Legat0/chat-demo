@@ -19,6 +19,7 @@ Auth::routes();
 
 Route::get('conversations', 'ConversationController@index');
 Route::post('conversations', 'ConversationController@store');
+Route::delete('conversations/{conversation}/delete', 'ConversationController@deleteConversation');
 
 Route::get('conversations/{conversation}/users', 'ConversationController@participants');
 Route::post('conversations/{conversation}/users', 'ConversationController@join');
@@ -27,6 +28,9 @@ Route::delete('conversations/{conversation}/users', 'ConversationController@leav
 Route::get('conversations/{conversation}/messages', 'ConversationController@getMessages');
 Route::post('conversations/{conversation}/messages', 'ConversationController@sendMessage');
 Route::delete('conversations/{conversation}/messages', 'ConversationController@deleteMessages');
+
+Route::get('messages/{message}/files', 'MessageController@getFiles');
+
 
 Route::get('/home', 'HomeController@index')->name('home');
 

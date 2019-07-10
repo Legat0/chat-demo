@@ -27,4 +27,14 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    public function ChangeStatus($status_id)
+    {
+        
+        $this->status_id = $status_id;
+        $this->save();
+        event(new Events\ChangeUserStatus($this));     
+       
+        return $this;
+    }
 }

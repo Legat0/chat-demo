@@ -10,7 +10,7 @@
         <div class="chat-body clearfix">
           <div class="header">
             <a href="#" @click="showConversation(convo.id)">
-              <strong class="primary-font">Conversation {{ convo.id }}</strong>
+              <strong class="primary-font">{{ convo.name }}</strong>
             </a> |
             <a
               v-if="!isParticipant(convo.id)"
@@ -29,6 +29,22 @@
             >
               <strong>Leave</strong>
             </a>
+            <a              
+              href="#"
+              class="text-info"
+              title="rename conversation"
+              @click="renameConversation(index, convo)"
+            >
+              <strong>Rename</strong>
+            </a>
+            <a              
+              href="#"
+              class="text-danger"
+              title="delete conversation"
+              @click="deleteConversation(index,convo.id)"
+            >
+              <strong>Delete</strong>
+            </a>
           </div>
           <p></p>
         </div>
@@ -39,7 +55,7 @@
 
 <script>
 export default {
-  data: () => ({
+  data: () => ({        
     conversation: null,
     conversations: []
   }),
@@ -47,10 +63,31 @@ export default {
   props: ["messages"],
 
   methods: {
+    getNewConvName(prevName){
+      var name =  prompt('Name conversation', prevName);
+      return name;
+    },
     createConversation() {
-      axios.post("/conversations").then(response => {
-        location.reload();
-      });
+      var newConversationName = this.getNewConvName('New conversation');
+      
+      if (newConversationName !== null && newConversationName !== "") {
+        axios.post("/conversations", {name: newConversationName }).then(response => {          
+          location.reload();          
+        });
+      }
+      
+    },
+    renameConversation(index, convo) {
+      var newConversationName  = this.getNewConvName(convo.name);
+      
+      if (newConversationName !== null && newConversationName !== "") {
+        axios.post("/conversations", {'name': newConversationName, 'id': convo.id }).then(response => {
+          Vue.set(this.conversations,index, response.data);
+
+          //location.reload();          
+        });
+      }
+      
     },
 
     fetchConversations() {
@@ -70,6 +107,11 @@ export default {
     leaveConversation(id) {
       axios.delete(`/conversations/${id}/users`).then(response => {
         window.location.href = "home?conversation_id=" + id;
+      });
+    },
+    deleteConversation(index, id) {
+      axios.delete(`/conversations/${id}/delete`).then(response => {
+        window.location.href = "home";  
       });
     },
 

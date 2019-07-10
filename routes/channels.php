@@ -18,3 +18,5 @@ Broadcast::channel('App.User.{id}', function ($user, $id) {
 Broadcast::channel('presence-mc-chat-conversation.{conversationId}', function ($user) {
     return ['id' => $user->id, 'name' => $user->name];
 });
+
+Broadcast::channel('UserEvents', App\Broadcasting\UserEvents::class);

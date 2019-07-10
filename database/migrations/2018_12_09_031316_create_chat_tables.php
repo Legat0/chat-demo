@@ -16,7 +16,7 @@ class CreateChatTables extends Migration
         Schema::create('mc_conversations', function (Blueprint $table) {
             $table->increments('id');
             $table->boolean('private')->default(true);
-            $table->text('data')->nullable();
+            $table->text('data')->nullable();           
             $table->timestamps();
         });
 
@@ -34,7 +34,8 @@ class CreateChatTables extends Migration
 
             $table->foreign('conversation_id')
                 ->references('id')
-                ->on('mc_conversations');
+                ->on('mc_conversations')
+                ->onDelete('cascade');
         });
 
         Schema::create('mc_conversation_user', function (Blueprint $table) {
@@ -86,9 +87,29 @@ class CreateChatTables extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('mc_conversations');
-        Schema::dropIfExists('mc_messages');
         Schema::dropIfExists('mc_conversation_user');
         Schema::dropIfExists('mc_message_notification');
+        if (Schema::hasTable('mc_messages'))
+		{
+            Schema::table('mc_messages', function (Blueprint $table) { 
+                if(Schema::hasColumn('mc_messages', 'conversation_id')) {
+                    $table->dropForeign('mc_messages_conversation_id_foreign');
+                    $table->dropColumn('conversation_id');
+                }
+                if(Schema::hasColumn('mc_messages', 'user_id')) {
+                    $table->dropForeign('mc_messages_user_id_foreign');
+                    $table->dropColumn('user_id');
+                }   
+                
+            });
+
+        }
+        
+        Schema::dropIfExists('mc_messages');
+
+        Schema::dropIfExists('mc_conversations');
+        
+        
+      
     }
 }
